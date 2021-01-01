@@ -1,5 +1,7 @@
-requests==2.24.0
-discord.py==1.5.1
 mgz==1.4.13
+discord.py==1.5.1
+requests==2.24.0
 discord==1.0.1
+gspread==3.6.0
+protobuf==3.14.0
 python-dotenv==0.15.0
