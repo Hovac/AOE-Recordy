@@ -13,17 +13,16 @@ from google.oauth2.service_account import Credentials
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
-
 scopes = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
 ]
 credentials = Credentials.from_service_account_file(
-    'credentials.json',
+    'google-credentials.json',
     scopes=scopes
-)
+) 
 g_client = gspread.authorize(credentials)
-stats_sheet_key="1xgwnOon91pglyU8E0Wu_NOVM4Dwr3yOy3zBjB_YFJ_8"
+stats_sheet_key="1NQsKhFCFvTs1x-pQMF8vuca0Z10OwHiO-3sdZqIm-r8"
 
 civCode = ["Britons", "Franks", "Goths", "Teutons", "Japanese", "Chinese", "Byzantines", "Persian", "Saracens", "Turks", "Vikings", "Mongols", "Celts", "Spanish", "Aztecs", "Mayans", "Huns", "Koreans", "Italians", "Indians", "Incas", "Magyars", "Slav", "Portuguese", "Ethiopians", "Malians", "Berbers", "Khmer", "Malay", "Burmese", "Vietnamese", "Bulgarians", "Tatars", "Cumans", "Lithuanians", "burgundians", "sicilians"]
 
