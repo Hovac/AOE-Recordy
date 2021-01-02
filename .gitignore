@@ -1,5 +1,5 @@
 .env
 .vscode
 credentials.json
-__pycache__
+__pycache__/
 currentDLGame.aoe2record
