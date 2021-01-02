@@ -22,7 +22,7 @@ credentials = Credentials.from_service_account_file(
     scopes=scopes
 ) 
 g_client = gspread.authorize(credentials)
-stats_sheet_key="1SYTg0jEoRdLuRKx8JS9-Z8tD9X7zzz0fZge24Om1FOk"
+googleSheetLink="1NQsKhFCFvTs1x-pQMF8vuca0Z10OwHiO-3sdZqIm-r8"
 
 civCode = ["Britons", "Franks", "Goths", "Teutons", "Japanese", "Chinese", "Byzantines", "Persian", "Saracens", "Turks", "Vikings", "Mongols", "Celts", "Spanish", "Aztecs", "Mayans", "Huns", "Koreans", "Italians", "Indians", "Incas", "Magyars", "Slav", "Portuguese", "Ethiopians", "Malians", "Berbers", "Khmer", "Malay", "Burmese", "Vietnamese", "Bulgarians", "Tatars", "Cumans", "Lithuanians", "burgundians", "sicilians"]
 
@@ -62,7 +62,7 @@ async def on_message(msg):
 #    await msg.channel.send(replyMsg)
 
 async def upload_to_sheets(msg, summary):
-    sh = g_client.open_by_key(stats_sheet_key)
+    sh = g_client.open_by_key(googleSheetLink)
     HTH_sheet = sh.worksheet("Head-to-Head")
 
     winners_names = util.get_winner_names(summary)
