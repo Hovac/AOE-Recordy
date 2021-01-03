@@ -48,6 +48,9 @@ teamMappings = team.TeamMappings()
 
 @client.event
 async def on_message(msg):
+    if msg.author == client.user:
+            return
+
     if msg.attachments:
         if msg.attachments[0].url.endswith("aoe2record"):
             #await respond_message(msg)
@@ -103,29 +106,30 @@ async def format_and_send_summary(msg, summary):
     loserCiv = []
     wTeam = ""
     lTeam = ""
+    wTeamName = ""
+    lTeamName = ""
 
     for x in allPlayers:
         if x["winner"]:
             winnerNames.append(x["name"])
             winnerCiv.append(civCode[x["civilization"]-1])
+            if wTeamName == "":
+                wTeamName = teamMappings.findTeamNameByPlayer(x["name"])
         else:
             loserNames.append(x["name"])
             loserCiv.append(civCode[x["civilization"]-1])
+            if lTeamName == "":
+                lTeamName = teamMappings.findTeamNameByPlayer(x["name"])
     for w in range(len(winnerNames)):
         wTeam += winnerNames[w] + " - " + winnerCiv[w] + "\n"
         lTeam += loserNames[w] + " - " + loserCiv[w] + "\n"
 
     embed = discord.Embed(title = "Map: ||" + str(pMap["name"]) + "||")
-    if random.randint(0,1) == 1:
-        embed.add_field(name = "Winner:", value = "||**Team 1**||", inline= False)
-        embed.add_field(name = "Team 1", value = wTeam, inline = True)
-        embed.add_field(name = "VS", value = "   -   \n"*len(winnerNames), inline = True)
-        embed.add_field(name = "Team 2", value = lTeam, inline = True)
-    else:
-        embed.add_field(name = "Winner:", value = "||**Team 2**||", inline= False)
-        embed.add_field(name = "Team 1", value = lTeam, inline = True)
-        embed.add_field(name = "VS", value = "   -   \n"*len(winnerNames), inline = True)
-        embed.add_field(name = "Team 2", value = wTeam, inline = True)
+    embed.add_field(name = "Winner:", value = "||**{}**||".format(wTeamName), inline= False)
+    embed.add_field(name = wTeamName, value = wTeam, inline = True)
+    embed.add_field(name = "VS", value = "   -   \n"*len(winnerNames), inline = True)
+    embed.add_field(name = lTeamName, value = lTeam, inline = True)
+
     await msg.channel.send(embed = embed)
 
 client.run(TOKEN)
