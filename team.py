@@ -1,5 +1,6 @@
 # Operations around syncing the player/team mapping in google sheets to the local db files as well as retrieving those mappings
 # If the sheet has not changed since the last sync has ran, retrieval of team names will be faster and we wont use up google sheet api call quotas
+# Note: The db structure is not optimized for the main retrieval of team name from player name (mapping is currently team name -> player names)
 
 from enum import Enum
 import pickledb
@@ -34,6 +35,28 @@ class TeamMappings(object):
         self.teamSheet = self.g_client.open_by_key(self.googleSheetLink).worksheet("Player_Team_Mapping")
         self._syncWithSheets()
     
+   
+    def findTeamNameByPlayer(self, playerName):
+        name = self._interalFindTeamNameByPlayer(playerName)
+        return name if name != None else "Unknown Team"  
+
+    def findTeamNameByPlayerAndSync(self, playerName):
+        name = self._interalFindTeamNameByPlayer(playerName)
+        if name == None:
+            # sync and try again
+            self._syncWithSheets()
+            name = self._interalFindTeamNameByPlayer(playerName)            
+            return name if name != None else "Unknown Team"     
+        else:
+            return name
+
+    # Due to the mapping in the db of team -> player (not the other way around) this is not optimized
+    def _interalFindTeamNameByPlayer(self, playerName):
+        for teamName in self.teamsDB.dgetall(TEAM_DICT_KEY):
+            for player in json.loads(self.teamsDB.dget(TEAM_DICT_KEY, teamName))['players']:
+                if playerName.upper() == player.upper():
+                    return teamName
+
     # To be called during init as well as before any queries that need to be 100% up to date with sheets
     def _syncWithSheets(self):
         currentVals = self.teamSheet.get_all_values()
