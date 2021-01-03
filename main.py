@@ -24,7 +24,7 @@ credentials = Credentials.from_service_account_file(
     scopes=scopes
 ) 
 g_client = gspread.authorize(credentials)
-googleSheetLink="1SYTg0jEoRdLuRKx8JS9-Z8tD9X7zzz0fZge24Om1FOk"
+googleSheetLink="1p04CIWAJHLUA3wSj9Q80mp8MONzqHhlePPqnF7UdizI"
 
 civCode = ["Britons", "Franks", "Goths", "Teutons", "Japanese", "Chinese", "Byzantines", "Persian", "Saracens", "Turks", "Vikings", "Mongols", "Celts", "Spanish", "Aztecs", "Mayans", "Huns", "Koreans", "Italians", "Indians", "Incas", "Magyars", "Slav", "Portuguese", "Ethiopians", "Malians", "Berbers", "Khmer", "Malay", "Burmese", "Vietnamese", "Bulgarians", "Tatars", "Cumans", "Lithuanians", "burgundians", "sicilians"]
 
@@ -72,30 +72,30 @@ async def on_message(msg):
 
 async def upload_to_sheets(msg, summary):
     sh = g_client.open_by_key(googleSheetLink)
-    HTH_sheet = sh.worksheet("Head-to-Head")
+    HTH_sheet = sh.worksheet("Results")
 
-    winners_names = util.get_winner_names(summary)
-    player_names = util.get_player_names(summary)
+    winningTeam = teamMappings.findTeamNameByPlayer(util.get_winner_names(summary)[0])
+    losingTeam = teamMappings.findTeamNameByPlayer(util.get_loser_names(summary)[0])
 
-    player_1_cells = HTH_sheet.findall(player_names[0])
-    player_2_cells = HTH_sheet.findall(player_names[1])
+    winningTeamCell = HTH_sheet.findall(winningTeam)
+    losingTeamCell = HTH_sheet.findall(losingTeam)
     
     try:
-        player_1_score_cell = [player_1_cells[1].row, player_2_cells[0].col]
-        p1_updated_value = util.get_cell_updated_string(player_names[0] in winners_names, HTH_sheet.cell(player_1_score_cell[0], player_1_score_cell[1]).value, MAX_SCORE)
+        winningScoreCell = [winningTeamCell[1].row, losingTeamCell[0].col]
+        winningUpdatedVal = util.get_cell_updated_string(True, HTH_sheet.cell(winningScoreCell[0], winningScoreCell[1]).value, MAX_SCORE)
 
-        player_2_score_cell = [player_2_cells[1].row, player_1_cells[0].col]
-        p2_updated_value = util.get_cell_updated_string(player_names[1] in winners_names, HTH_sheet.cell(player_2_score_cell[0], player_2_score_cell[1]).value, MAX_SCORE)
+        losingScoreCell = [losingTeamCell[1].row, winningTeamCell[0].col]
+        losingUpdatedVal = util.get_cell_updated_string(False, HTH_sheet.cell(losingScoreCell[0], losingScoreCell[1]).value, MAX_SCORE)
         
         # don't update scores until we know there are no format issue to avoid cases where some updates are made, others fail, and the scores are left out of whack
-        util.update_cell(HTH_sheet, player_1_score_cell, p1_updated_value)
-        util.update_cell(HTH_sheet, player_2_score_cell, p2_updated_value)
+        util.update_cell(HTH_sheet, winningScoreCell, winningUpdatedVal)
+        util.update_cell(HTH_sheet, losingScoreCell, losingUpdatedVal)
     except IndexError:
         #await msg.channel.send("Error updating sheets for players ```{}``` Please make sure those players names are the exact same in both the row and col.".format(player_names))
-        print("Error updating sheets for players ```{}``` Please make sure those players names are the exact same in both the row and col.".format(player_names))
+        print("Error updating sheets for players ```{}``` Please make sure teams have the correct players/player names.".format(util.get_player_names(summary)))
     except ValueError:
         #await msg.channel.send("Error updating sheets for players ```{}``` Could not parse their score. Please make sure that their current scores have no values errors (should look like 1-0).".format(player_names))
-        print("Error updating sheets for players ```{}``` Could not parse their score. Please make sure that their current scores have no values errors (should look like 1-0).".format(player_names))
+        print("Error updating sheets for players ```{}``` Could not parse their score. Please make sure that their current scores have no values errors (should look like 1-0).".format(util.get_player_names(summary)))
 
 async def format_and_send_summary(msg, summary):
     allPlayers = summary.get_players()

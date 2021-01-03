@@ -3,6 +3,9 @@
 def get_winner_names(summary):
     return [ player["name"] for player in list(filter(lambda player: player["winner"], summary.get_players())) ]
 
+def get_loser_names(summary):
+    return [ player["name"] for player in list(filter(lambda player: not player["winner"], summary.get_players())) ]
+
 def get_player_names(summary):
     return [ player["name"] for player in summary.get_players() ]
 
