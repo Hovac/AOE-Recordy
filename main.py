@@ -40,6 +40,8 @@ civCode = ["Britons", "Franks", "Goths", "Teutons", "Japanese", "Chinese", "Byza
 ] """
 rndColor = ["yaml", "fix", "css"] #many more to come
 
+MAX_SCORE = 2
+
 @client.event
 async def on_message(msg):
     if msg.attachments:
@@ -73,10 +75,10 @@ async def upload_to_sheets(msg, summary):
     
     try:
         player_1_score_cell = [player_1_cells[1].row, player_2_cells[0].col]
-        p1_updated_value = util.get_cell_updated_string(player_names[0] in winners_names, HTH_sheet.cell(player_1_score_cell[0], player_1_score_cell[1]).value)
+        p1_updated_value = util.get_cell_updated_string(player_names[0] in winners_names, HTH_sheet.cell(player_1_score_cell[0], player_1_score_cell[1]).value, MAX_SCORE)
 
         player_2_score_cell = [player_2_cells[1].row, player_1_cells[0].col]
-        p2_updated_value = util.get_cell_updated_string(player_names[1] in winners_names, HTH_sheet.cell(player_2_score_cell[0], player_2_score_cell[1]).value)
+        p2_updated_value = util.get_cell_updated_string(player_names[1] in winners_names, HTH_sheet.cell(player_2_score_cell[0], player_2_score_cell[1]).value, MAX_SCORE)
         
         # don't update scores until we know there are no format issue to avoid cases where some updates are made, others fail, and the scores are left out of whack
         util.update_cell(HTH_sheet, player_1_score_cell, p1_updated_value)
