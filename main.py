@@ -6,6 +6,8 @@ import discord
 import asyncio
 import gspread
 import util
+import pickledb
+import team
 from dotenv import load_dotenv
 from mgz.summary import Summary
 from google.oauth2.service_account import Credentials
@@ -41,6 +43,8 @@ civCode = ["Britons", "Franks", "Goths", "Teutons", "Japanese", "Chinese", "Byza
 rndColor = ["yaml", "fix", "css"] #many more to come
 
 MAX_SCORE = 2
+
+teamMappings = team.TeamMappings()
 
 @client.event
 async def on_message(msg):
