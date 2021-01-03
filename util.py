@@ -17,9 +17,9 @@ def get_cell_updated_string(winner, current_val, max_score):
     p2Score = int(current_val_split[1])
 
     if winner:
-        return (str(p1Score + 1) if p1Score < max_score else p1Score) + "-" + current_val_split[1]
+        return (str(p1Score + 1) if p1Score < max_score else str(p1Score)) + "-" + current_val_split[1]
     else:
-        return current_val_split[0] + "-" + str((p2Score + 1) if p2Score < max_score else p2Score)
+        return current_val_split[0] + "-" + str((p2Score + 1) if p2Score < max_score else str(p2Score))
 
 def update_cell(sheet, cell, value):
     sheet.update_cell(cell[0], cell[1], value)
