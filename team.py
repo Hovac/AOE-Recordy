@@ -7,6 +7,7 @@ import pickledb
 import gspread
 import json
 from google.oauth2.service_account import Credentials
+import constants
 
 TEAM_DICT_KEY = "Teams"
 
@@ -26,16 +27,14 @@ class TeamMappings(object):
     credentials = Credentials.from_service_account_file(
         'google-credentials.json',
         scopes=scopes
-    ) 
-    googleSheetLink = "1p04CIWAJHLUA3wSj9Q80mp8MONzqHhlePPqnF7UdizI"
+    )
     
     def __init__(self):
         self.teamsDB = pickledb.load('teams.db', True)
         self.g_client = gspread.authorize(self.credentials)
-        self.teamSheet = self.g_client.open_by_key(self.googleSheetLink).worksheet("Player_Team_Mapping")
+        self.teamSheet = self.g_client.open_by_key(constants.teamNamesSheetLink).worksheet("Player_Team_Mapping")
         self._syncWithSheets()
     
-   
     def findTeamNameByPlayer(self, playerName):
         name = self._interalFindTeamNameByPlayer(playerName)
         return name if name != None else "Unknown Team"  
