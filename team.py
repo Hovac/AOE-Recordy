@@ -10,6 +10,7 @@ from google.oauth2.service_account import Credentials
 import constants
 
 TEAM_DICT_KEY = "Teams"
+UNKNOWN_TEAM = "Unknown Team"
 
 # players -> a list of player, len = 3 if there is a sub
 # group -> 'A' through 'F'
@@ -17,6 +18,23 @@ class Team(object):
     def __init__(self, players, group):
         self.players = players
         self.group = group
+
+# Cols:
+# Pos,Player(team name), Points, Wins, Losses, No-Shows, Played, Remaining, Group
+class TeamStats(object):
+    def __init__(self, position, name, points, wins, losses, noShows, played, remaining, group):
+        self.position = position
+        self.name = name
+        self.points = points
+        self.wins = wins
+        self.losses = losses
+        self.noShows = noShows
+        self.played = played
+        self.remaining = remaining
+        self.group = group
+    
+    def __str__(self):
+        return "position: {}, name: {}, points: {}, wins: {}, lossses: {}, noShows: {}, played: {}, remaining: {}, group: {}".format(self.position, self.name, self.points, self.wins, self.losses, self.noShows, self.played, self.remaining, self.group)
 
 class TeamMappings(object): 
 
@@ -33,11 +51,12 @@ class TeamMappings(object):
         self.teamsDB = pickledb.load('teams.db', True)
         self.g_client = gspread.authorize(self.credentials)
         self.teamSheet = self.g_client.open_by_key(constants.teamNamesSheetLink).worksheet("Player_Team_Mapping")
+        self.teamStandings = self.g_client.open_by_key(constants.League2v2SheetLink).worksheet(constants.League2v2SheetsName)
         self._syncWithSheets()
     
     def findTeamNameByPlayer(self, playerName):
         name = self._interalFindTeamNameByPlayer(playerName)
-        return name if name != None else "Unknown Team"  
+        return name if name != None else UNKNOWN_TEAM  
 
     def findTeamNameByPlayerAndSync(self, playerName):
         name = self._interalFindTeamNameByPlayer(playerName)
@@ -45,9 +64,17 @@ class TeamMappings(object):
             # sync and try again
             self._syncWithSheets()
             name = self._interalFindTeamNameByPlayer(playerName)            
-            return name if name != None else "Unknown Team"     
+            return name if name != None else UNKNOWN_TEAM    
         else:
             return name
+
+    def findTeamStatsByPlayerName(self, playerName):
+        teamName = self.findTeamNameByPlayer(playerName)
+        
+        if teamName != UNKNOWN_TEAM:
+            teamNameCell = self.teamStandings.find(teamName)
+            teamStatsRow = self.teamStandings.row_values(teamNameCell.row)            
+            return TeamStats(teamStatsRow[0], teamStatsRow[1], teamStatsRow[2], teamStatsRow[3], teamStatsRow[4], teamStatsRow[5], teamStatsRow[6], teamStatsRow[7], teamStatsRow[8]) 
 
     # Due to the mapping in the db of team -> player (not the other way around) this is not optimized
     def _interalFindTeamNameByPlayer(self, playerName):
