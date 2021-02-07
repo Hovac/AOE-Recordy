@@ -4,3 +4,4 @@ credentials.json
 __pycache__/
 currentDLGame.aoe2record
 *.db
+google-credentials.json
